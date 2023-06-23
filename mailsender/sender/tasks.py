@@ -25,8 +25,9 @@ def send_email_campaign(campaign_id):
         )
 
         tracking_uuid = uuid4()
+        pixel_url = settings.BASE_URL + '/sender/tracking/' + str(tracking_uuid) + '/'
         html_message += '<img src="{}" width="1" height="1" alt="Pixel">'.format(
-            tracking_uuid
+            pixel_url
         )
 
         send_mail(

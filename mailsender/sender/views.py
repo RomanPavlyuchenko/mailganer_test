@@ -1,3 +1,6 @@
+from os import path
+
+from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.views import View
 from django.views.generic import ListView, DetailView
@@ -6,7 +9,7 @@ from django.urls import reverse_lazy, reverse
 from django.contrib import messages
 
 from .forms import CreateEmailCampaignForm
-from .models import EmailCampaign, Subscriber
+from .models import EmailCampaign, Subscriber, EmailSubscriber
 
 
 def home(request):
@@ -54,3 +57,16 @@ class EmailCampaignDetailView(DetailView):
 class SendEmailCampaignView(View):
     def post(self, request, pk):
         return redirect('campaign_list')
+
+
+class TrackingView(View):
+    def get(self, request, tracking_uuid, *args, **kwargs):
+        script_dir = path.dirname(path.abspath(__file__))
+        image_data = open(path.join(script_dir, 'static/pixel.png'), 'rb').read()
+
+        tracking_email = EmailSubscriber.objects.filter(tracking_pixel=tracking_uuid).first()
+        if tracking_email:
+            tracking_email.opened = True
+            tracking_email.save()
+
+        return HttpResponse(image_data, content_type='image/png')
