@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <div class="container">
+    <h1>Email Campaigns</h1>
+    <ul>
+      {% for campaign in campaigns %}
+        <li><a href="{% url 'campaign_detail' campaign.pk %}">{{ campaign }}</a></li>
+      {% empty %}
+        <li>No campaigns found.</li>
+      {% endfor %}
+    </ul>
+  </div>
+{% endblock %}

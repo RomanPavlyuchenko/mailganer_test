@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <div class="container">
+    <h1>Create Email Campaign</h1>
+    <button id="openModal" class="btn btn-primary" data-toggle="modal" data-target="#campaignModal">Create Campaign</button>
+    <div id="campaignModal" class="modal fade" tabindex="-1" role="dialog">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Create Email Campaign</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <form id="campaignForm" method="POST" action="{% url 'create_campaign' %}">
+              {% csrf_token %}
+              <div class="form-group">
+                <label for="id_template">Template</label>
+                {{ form.template }}
+              </div>
+              <div class="form-group">
+                <label for="id_scheduled_time">Scheduled Time</label>
+                {{ form.scheduled_time }}
+              </div>
+              <div class="modal-footer">
+                <button type="submit" class="btn btn-primary">Create Campaign</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+              </div>
+            </form>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
+{% block scripts %}
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/js/bootstrap-datetimepicker.min.js"></script>
+  <script>
+    $(document).ready(function() {
+      $('.datetimepicker').datetimepicker({
+        format: 'YYYY-MM-DD HH:mm:ss',
+        icons: {
+          time: 'far fa-clock',
+          date: 'far fa-calendar',
+          up: 'fas fa-chevron-up',
+          down: 'fas fa-chevron-down',
+          previous: 'fas fa-chevron-left',
+          next: 'fas fa-chevron-right',
+          today: 'fas fa-calendar-check',
+          clear: 'far fa-trash-alt',
+          close: 'fas fa-times'
+        }
+      });
+
+      $('#campaignForm').submit(function(e) {
+        e.preventDefault();
+        var form = $(this);
+        $.ajax({
+          type: 'POST',
+          url: form.attr('action'),
+          data: form.serialize(),
+          success: function(response) {
+            $('#campaignModal').modal('hide');
+            window.location.href = response.redirect_url;
+          },
+          error: function(xhr, status, error) {
+            var err = JSON.parse(xhr.responseText);
+            console.log(err);
+          }
+        });
+      });
+    });
+  </script>
+{% endblock %}

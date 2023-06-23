@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <div class="container">
+    <h1>{{ campaign }}</h1>
+    {% if campaign.sent %}
+      <p>Sent: Yes</p>
+    {% else %}
+      <p>Sent: No</p>
+      <form method="POST" action="{% url 'send_campaign' campaign.pk %}">
+        {% csrf_token %}
+        <button id="sendCampaignBtn" class="btn btn-primary" data-url="{% url 'send_campaign' campaign.id %}">Send Campaign</button>
+
+        <!-- <button type="submit" class="btn btn-primary">Send Campaign</button> -->
+      </form>
+    {% endif %}
+  </div>
+{% endblock %}

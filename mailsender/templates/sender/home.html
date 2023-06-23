@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Home
+{% endblock %}
+
+{% block content %}
+    <h1>Welcome to the Email Service</h1>
+    <p>This is the home page of our email service.</p>
+    <p>Here you can create and manage your email campaigns.</p>
+    <a href="{% url 'create_campaign' %}" class="btn btn-primary">Create Campaign</a>
+{% endblock %}
