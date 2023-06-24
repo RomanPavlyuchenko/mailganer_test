@@ -1,0 +1,65 @@
+version: '3.3'
+services:
+  server:
+    build:
+      context: ./
+      dockerfile: ./mailsender/Dockerfile
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - ./mailsender:/mailsender
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    env_file:
+      - .env
+    entrypoint: /mailsender/entrypoint.sh
+
+  db:
+    image: postgres:12.4-alpine
+    env_file:
+      - .env
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
+    volumes:
+      - ./db:/var/lib/postgresql/data/
+
+  redis:
+    image: redis
+    ports:
+      - "6379:6379"
+
+  celery_worker:
+    build:
+      context: ./
+      dockerfile: ./mailsender/Dockerfile
+    command: celery --app=sender  worker --loglevel=DEBUG --logfile=/mailsender/celery.log
+    volumes:
+      - ./mailsender:/mailsender
+    depends_on:
+      - server
+      - redis
+    env_file:
+    - .env
+
+
+  celery_beat:
+    build:
+      context: ./
+      dockerfile: ./mailsender/Dockerfile
+    command: celery --app=sender beat  --loglevel=DEBUG --logfile=/mailsender/celery_beat.log
+    volumes:
+      - ./mailsender:/mailsender
+    depends_on:
+      - server
+      - redis
+      - celery_worker
+    env_file:
+    - .env
