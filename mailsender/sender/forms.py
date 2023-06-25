@@ -8,5 +8,10 @@ class CreateEmailCampaignForm(forms.ModelForm):
         fields = ['template', 'scheduled_time']
 
         widgets = {
-            'scheduled_time': forms.DateTimeInput(attrs={'class': 'form-control datetimepicker'}),
+            'scheduled_time': forms.DateTimeInput(
+                attrs={
+                    'class': 'form-control datetimepicker',
+                    'data-date-start-date': '0d'
+                }
+            ),
         }
